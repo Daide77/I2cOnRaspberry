@@ -1,0 +1,27 @@
+[Unit]
+Description=Python I2C Service
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/python/main.py -c /home/pi/python/mycfng.json
+Restart=on-failure
+Environment=PYTHONUNBUFFERED=1
+[Install]
+WantedBy=default.target
+
+# Install the script:
+# this script must be placed in
+# ~/.config/systemd/user/allarm_box_service.service
+# then reload the deamon ( maybe not necessary but safer )
+# systemctl --user daemon-reload
+# try to start it 
+# systemctl --user start allarm_box_service
+# and check if it works
+# systemctl --user status allarm_box_service
+# see logs
+# journalctl --user-unit allarm_box_service.service 
+# Search the service and see the status
+# systemctl --user list-unit-files | grep allarm_box_service
+# eneable at boot time
+# systemctl --user enable allarm_box_service
+# sudo loginctl enable-linger $USER
+# source:
+# https://github.com/torfsen/python-systemd-tutorial
