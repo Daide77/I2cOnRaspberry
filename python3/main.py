@@ -106,7 +106,8 @@ class Flags_bits(ctypes.LittleEndianStructure):
               ]
 
 class Flags(ctypes.Union):
-   _fields_ = [ ("b"     , Flags_bits) ,
+   _fields_ = [ 
+                ("b"     , Flags_bits) ,
                 ("asbyte", c_uint8   )
               ]
 
