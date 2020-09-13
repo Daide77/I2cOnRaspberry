@@ -75,7 +75,8 @@ def sub_cb( client, userdata, msg ):
           if k == 'COMMAND' and cmd[k] == 'REBOOT':
                log( "INFO", "Command is to reboot!" )
        # TODO pensare a comandi tipo free, top, df, who -b per investigare lo stato le raspy        
-       # GS.c.publish( GS.OUT_STATUS, msg=json.dumps(GS.statusMsg), retain=True, qos=1 )
+       log( "INFO", "sub_cb Pubblish Status" )
+       GS.c.publish( GS.OUT_STATUS, payload=json.dumps(GS.statusMsg), retain=True, qos=1 )
 
 def MqttSetUP( GS ):
    GS.c            = mqtt.Client()
