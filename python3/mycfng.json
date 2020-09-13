@@ -7,5 +7,5 @@
    "MQTT_IN_CMD_TOPIC"           : "TOpic/Comand"                   ,
    "LOG_LEVEL"                   : "INFO,WARN,ERROR"                ,
    "SMBus"                       : 0                                ,
-   "I2cAddresses"                : [ 32 ] 
+   "I2cAddresses"                : [ 32, 33 ] 
 }
