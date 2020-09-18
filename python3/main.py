@@ -148,6 +148,7 @@ if __name__ == "__main__":
       GS.i2cDevStatus[str(address)]["Value"] = 666     # Impossible value to force push the first time
    
    flags                                     = Flags() # Easy way to manage a bitfield
+   GS.statusMsg["I2C"] = {}
    while True:
       for address in addresses: 
          write( address, 0x00 )
@@ -155,7 +156,6 @@ if __name__ == "__main__":
          rng                 = range(address)
          flags.asbyte        = rng
          log( "DEBUG", "New Reading Device: [ {} ] Byte Value: [ {} ]".format( address, flags.asbyte )  )
-         GS.statusMsg["I2C"] = {}
          # TODO add lastupdate
          for f in flags.b._fields_:
              name                      = "Dev{}{}".format( address,f[0] )
