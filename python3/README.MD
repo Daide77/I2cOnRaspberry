@@ -3,10 +3,7 @@ main.py is the actual program
 
 ScanI2cOnSmbus.py is a silly tool to discover your I2C Boards on a given Bus
 
-Inside the systemd directory you can find a user systemd script.
+Inside the systemd directory you can find a user systemd script with respawn.
 
 The comments describe how to install it
 
-# TODO RECONNECTION
-
-# Check if when it reconnects it still receives messages from the broker.

@@ -45,7 +45,6 @@ def log( Level, msg ):
 
 def LoadConfig( GS ):
    with open( GS.ConfigFile ) as data_file:
-      # data            = json.load( str(data_file.readlines()).strip() )
       log( "INFO", "Loading conf from file: ["+GS.ConfigFile+"]" )
       GS.data           = json.load( data_file )
       GS.CLIENTID       = GS.data["MQTTclientid"]
@@ -63,34 +62,30 @@ def sub_cb( client, userdata, msg ):
     log( 'INFO', "Called sub_cb:" )
     log( 'INFO', ( msg.topic, msg.payload.decode("utf-8") ) )
     if msg.topic == GS.IN_CMD_TOPIC:
-       # MsddgIn example : '{ "COMMAND": "REBOOT" }'
-       try:
-          cmd = json.loads( msg.payload.decode("ut8-8") )
-       except:
-          cmd = {}
-       if type( cmd ) is not dict:
-          log( "WARN", "wrong command format! " + str( msg ))
-          cmd = {}
+       cmd = eval( msg.payload.decode('utf-8') )
        for k in cmd :
           if k == 'COMMAND' and cmd[k] == 'REBOOT':
-               log( "INFO", "Command is to reboot!" )
-       # TODO pensare a comandi tipo free, top, df, who -b per investigare lo stato le raspy        
+            log( "INFO", "Command asks to exit and restart!Do you have a respwan mechanism in place?" )
+            userdata.EXIT = True     
        log( "INFO", "sub_cb Pubblish Status" )
        GS.c.publish( GS.OUT_STATUS, payload=json.dumps(GS.statusMsg), retain=True, qos=1 )
 
+def sub_cb_Disconnect( client, userdata, rc ):
+   log( "ERROR", "Disconnected from Mqtt!" )
+   userdata.EXIT = True     
+
 def MqttSetUP( GS ):
-   GS.c            = mqtt.Client()
+   GS.EXIT         = False 
+   client_userdata = { 'EXIT' : GS.EXIT }
+   GS.c            = mqtt.Client( userdata = GS )
    GS.c.username_pw_set( GS.USER, GS.PSWD )
-   GS.c.on_message = sub_cb
+   GS.c.on_message    = sub_cb
+   GS.c.on_disconnect = sub_cb_Disconnect
    GS.c.will_set( GS.OUT_STATUS, payload=b'{"status": "OFFLINE"}', qos=1, retain=True)
-   try:
-      log( "INFO", "Connecting to MQTT server...." )
-      GS.c.connect( GS.SERVER )
-   except Exception as e:
-      log( "ERROR", "Error MqttConnection {}".format(e) )
+   log( "INFO", "Connecting to MQTT server...." )
+   GS.c.connect( GS.SERVER )
    log( "INFO", "OK! Connected to MQTT server" )
    GS.c.subscribe( GS.IN_CMD_TOPIC )
-   GS.c.loop_start()
    GS.c.publish( GS.OUT_STATUS, payload=b'{"status": "ONLINE"}',qos=1, retain=True )
 
 # Gestione bitfield 
@@ -140,6 +135,7 @@ if __name__ == "__main__":
    bus               = smbus.SMBus(GS.SMBus)
    addresses         = GS.I2cAddresses
    MqttSetUP( GS )
+   GS.c.loop_start()
    
    GS.i2cDevStatus   = {}
    
@@ -168,3 +164,6 @@ if __name__ == "__main__":
             GS.c.publish( GS.OUT_STATUS, payload=json.dumps( GS.statusMsg ),qos=1, retain=True )
             GS.i2cDevStatus[str(address)]["Value"] = flags.asbyte
          log( "DEBUG", "----- END -------" )
+      if GS.EXIT==True:
+         log( "WARN", "Exit Program!" )
+         exit(255)
