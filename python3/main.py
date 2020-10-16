@@ -76,7 +76,6 @@ def sub_cb_Disconnect( client, userdata, rc ):
 
 def MqttSetUP( GS ):
    GS.EXIT         = False 
-   client_userdata = { 'EXIT' : GS.EXIT }
    GS.c            = mqtt.Client( userdata = GS )
    GS.c.username_pw_set( GS.USER, GS.PSWD )
    GS.c.on_message    = sub_cb
